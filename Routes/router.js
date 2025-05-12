@@ -9,4 +9,5 @@ router.post('/saveproducts',productController.addProjects)
 router.get('/getproducts',productController.getProducts)
 router.post('/user/register',userController.registerUser)
 router.post('/user/login',userController.loginUser)
+router.get('/user/userDetails',userController.userDetails)
 module.exports = router;

@@ -45,3 +45,14 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ success: false, message: "Login failed", error: err });
     }
 }
+// get logged in user details
+exports.userDetails=async(req,res)=>{
+  try{
+     const userId=req.payload
+   const userDetails= await users.find({userId:userId})
+   res.status(200).json(userDetails)
+  }
+  catch(err){
+    res.status(401).json(err)
+  }
+}
