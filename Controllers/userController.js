@@ -1,5 +1,6 @@
 const { findOneAndUpdate } = require("../Models/userSchema")
 const users = require('../Models/userSchema')
+const jwt=require('jsonwebtoken')
 //user registration
 exports.registerUser=async (req,res)=>{
     const {username,email,phone,password}=req.body
@@ -33,24 +34,29 @@ exports.loginUser = async (req, res) => {
 
     try {
         const existingUser = await users.findOne({ username: username, password: password });
-        if (existingUser) {
-            res.status(200).json({ success: true, message: "User exists" });
-            console.log("User already exists");
-        } else {
-            res.status(406).json({ success: false, message: "Login failed due to invalid username or password" });
-            console.log("User is not found");
+         if (existingUser) {
+            const token=jwt.sign({userId:existingUser._id},"supersecretkey")
+            console.log("Token:",token)
+            res.status(200).json({
+                user_data:existingUser,
+                jwt_token:token
+            })
         }
-    } catch (err) {
-        console.error("Login error:", err);
-        res.status(500).json({ success: false, message: "Login failed", error: err });
+        else {
+            res.status(406).json("Login failed due to invalid email or password")
+        }
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json("Login blocked due to:", err)
     }
 }
 // get logged in user details
 exports.userDetails=async(req,res)=>{
   try{
-     const userId=req.payload
-   const userDetails= await users.find({userId:userId})
-   res.status(200).json(userDetails)
+      const userId = req.payload;
+        const userDetails= await users.findOne({ _id: userId })
+        res.status(200).json(userDetails)
   }
   catch(err){
     res.status(401).json(err)
